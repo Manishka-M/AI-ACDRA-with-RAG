@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 #  Page config  (must be first Streamlit call)                        #
 # ------------------------------------------------------------------ #
 st.set_page_config(
-    page_title="AI Autonomous Cognitive Engine",
+    page_title="AI Autonomous Cognitive Engine For Long-Horizon Tasks",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded",

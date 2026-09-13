@@ -74,7 +74,7 @@ with st.sidebar:
 # ------------------------------------------------------------------ #
 st.markdown("""
 <h1 style='text-align:center;'>
-    🧠 AI Autonomous Cognitive Engine
+    🧠 AI Autonomous Cognitive Deep-Research Engine
 </h1>
 <p style='text-align:center; color:gray;'>
     Ask anything — the agent plans, researches, reasons, and writes a full report.

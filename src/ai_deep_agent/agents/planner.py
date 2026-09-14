@@ -66,7 +66,70 @@ comparison, broad evaluation, report writing):
 You MUST call the `write_todos` tool. Do not output prose.
 """
 
+# _llm = get_llm(role="planner").bind_tools([write_todos])
+
+
+# def run_planner(user_query: str) -> list[dict]:
+#     messages = [
+#         SystemMessage(content=PLANNER_PROMPT),
+#         HumanMessage(content=user_query),
+#     ]
+#     response = _llm.invoke(messages)
+#     if hasattr(response, "tool_calls") and response.tool_calls:
+#         args  = response.tool_calls[0].get("args", {})
+#         tasks = args.get("tasks", [])
+#         return write_todos.invoke({"tasks": tasks})
+#     return [{"id": 1, "task": user_query, "status": "pending"}]
+
+
+
+
+
 _llm = get_llm(role="planner").bind_tools([write_todos])
+
+
+def _coerce_tasks(raw) -> list[str]:
+    """
+    Defensively coerce whatever shape the LLM's tool call returned for
+    `tasks` into a clean list[str].
+
+    Free/weaker models don't always follow a tool's argument schema
+    exactly -- they sometimes return a list of dicts like
+    {"task": "..."} instead of plain strings, or a single string
+    instead of a list. Without this, write_todos.invoke() raises a
+    pydantic ValidationError and takes the whole graph run down.
+    """
+    if raw is None:
+        return []
+
+    if isinstance(raw, str):
+        raw = [raw]
+
+    if not isinstance(raw, list):
+        raw = [raw]
+
+    cleaned: list[str] = []
+
+    for item in raw:
+        if isinstance(item, str):
+            text = item
+        elif isinstance(item, dict):
+            text = (
+                item.get("task")
+                or item.get("description")
+                or item.get("text")
+                or item.get("title")
+                or str(item)
+            )
+        else:
+            text = str(item)
+
+        text = text.strip()
+
+        if text:
+            cleaned.append(text)
+
+    return cleaned
 
 
 def run_planner(user_query: str) -> list[dict]:
@@ -75,8 +138,42 @@ def run_planner(user_query: str) -> list[dict]:
         HumanMessage(content=user_query),
     ]
     response = _llm.invoke(messages)
+
+    # --- Path 1: Model called write_todos tool correctly ---
     if hasattr(response, "tool_calls") and response.tool_calls:
         args  = response.tool_calls[0].get("args", {})
-        tasks = args.get("tasks", [])
-        return write_todos.invoke({"tasks": tasks})
+        tasks = _coerce_tasks(args.get("tasks"))
+        if tasks:
+            try:
+                return write_todos.invoke({"tasks": tasks})
+            except Exception:
+                pass  # fall through to text fallback
+
+    # --- Path 2: Model returned plain numbered list (no tool call) ---
+    import re
+    c    = response.content
+    text = (
+        " ".join(
+            p.get("text", "") if isinstance(p, dict) else str(p)
+            for p in c
+        ).strip()
+        if isinstance(c, list) else str(c).strip()
+    )
+    # Strip tool-call artifacts if any
+    text = re.sub(r'<\|tool_call_start\|>.*?<\|tool_call_end\|>', '', text, flags=re.DOTALL).strip()
+
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    tasks = []
+    for line in lines:
+        cleaned = re.sub(r'^[\d]+[.)\-:]\s*', '', line).strip()
+        cleaned = re.sub(r'^[-*•]\s*', '', cleaned).strip()
+        if cleaned and len(cleaned) > 15 and not cleaned.endswith(":"):
+            tasks.append(cleaned)
+    if tasks:
+        try:
+            return write_todos.invoke({"tasks": _coerce_tasks(tasks[:7])})
+        except Exception:
+            pass
+
+    # --- Path 3: Last resort fallback ---
     return [{"id": 1, "task": user_query, "status": "pending"}]

@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 #  Page config                                                        #
 # ------------------------------------------------------------------ #
 st.set_page_config(
-    page_title="AI Autonomous Cognitive Engine",
+    page_title="AI Autonomous Cognitive Deep-Research Engine",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded",

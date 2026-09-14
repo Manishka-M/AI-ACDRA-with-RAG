@@ -68,7 +68,7 @@ def _strip_artifacts(text: str) -> str:
 # ------------------------------------------------------------------ #
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/4616/4616013.png", width=64)
-    st.title("🧠 AI Cognitive Deep-Research Engine")
+    st.title("🧠 AI Autonomous Cognitive Deep-Research Engine")
     st.caption("Deep-Research · Long Horizon Tasks · Autonomous Multi-Agent")
     st.divider()
     st.markdown("### 🧠 Agent Architecture")
@@ -88,7 +88,7 @@ with st.sidebar:
         os.environ.get("OPENROUTER_MODEL")
         or os.environ.get("GEMINI_MODEL")
         or os.environ.get("ANTHROPIC_MODEL")
-        or "Kya Farak Padta Hai!"
+        or "Kya Farak Padta Hai, Chal toh raha hai na?"
     )
     st.markdown("### ⚙️ Config")
     st.code(f"Model: {model}")

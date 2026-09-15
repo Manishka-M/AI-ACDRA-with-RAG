@@ -72,7 +72,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
 from langchain_core.documents import Document
 
-CHROMA_PATH = "./chroma_db"
+CHROMA_PATH = "/tmp/chroma_db"
 # ------------------------------------------------------------------ #
 #  Lazy embedding loader                                              #
 #  HuggingFace model sirf tab load hoga jab pehli baar zarurat ho   #

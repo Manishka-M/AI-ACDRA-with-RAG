@@ -20,12 +20,9 @@ langchain-huggingface
 langchain_chroma
 langchain-text-splitters
 chromadb
-sentence-transformers
 tavily-python
 langgraph
 python-dotenv
 python-docx
 fpdf2
 pypdf
-torch
-torchvision

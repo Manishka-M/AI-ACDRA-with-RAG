@@ -7,6 +7,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+chroma_db/
 
 # Virtual environments — never upload these
 .venv/

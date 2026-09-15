@@ -17,6 +17,9 @@ from ai_deep_agent.llms.factory    import get_llm
 from ai_deep_agent.memory.virtual_fs import workspace
 from ai_deep_agent.state.state     import AgentState
 import ai_deep_agent.display.console as ui
+from ai_deep_agent.memory.vector_store import retrieve_context
+
+
 
 MAX_RETRIES = 2
 
@@ -97,6 +100,8 @@ def run_supervisor(state: AgentState) -> AgentState:
     # ──────────────────── PLANNING ────────────────────
     if not state.get("planning_complete", False):
         workspace.clear()
+        rag_context = retrieve_context(state["user_query"], k=4)
+        state["retrieved_context"] = rag_context
         todos = run_planner(state["user_query"])
         state.update({
             "todos":             todos,
@@ -126,9 +131,10 @@ def run_supervisor(state: AgentState) -> AgentState:
         ui.task_start(task_id, len(todos), task_desc, worker)
         log.append({"event": "task_start", "id": task_id, "worker": worker, "task": task_desc})
 
-        out    = DISPATCH[worker](
-            task=task_desc, task_id=task_id,
-            feedback="", previous_output="",
+        out = DISPATCH[worker](
+        task=task_desc, task_id=task_id,
+        feedback="", previous_output="",
+        rag_context=state.get("retrieved_context", ""),
         )
         result = out["result"]
 

@@ -13,3 +13,5 @@ class AgentState(TypedDict):
     retry_counts:      dict[int, int]
     execution_log:     list[dict[str, Any]]
     sources:           list[dict[str, str]]
+    retrieved_context:  str          # RAG se aaya context
+    chat_history:       list[dict]   # Conversation history

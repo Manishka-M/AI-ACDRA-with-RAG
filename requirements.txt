@@ -17,7 +17,7 @@ langchain-core
 langchain-openai
 langchain-community
 langchain-huggingface
-langchain-chroma
+langchain_chroma
 langchain-text-splitters
 chromadb
 sentence-transformers
@@ -27,3 +27,5 @@ python-dotenv
 python-docx
 fpdf2
 pypdf
+torch
+torchvision
